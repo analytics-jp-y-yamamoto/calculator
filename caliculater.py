@@ -1,19 +1,8 @@
 import streamlit as st
 import pandas as pd
 
-button_css = f"""
-<style>
-  div.stButton > button:first-child  {{
-    width:150px;
-    height:50px;
-    border: 2px solid #f35 ;
-    border-radius: 10px 10px 10px 10px ;
-  }}
-
-</style>
-"""
-
-st.markdown(button_css, unsafe_allow_html = True)
+with open('calculater.css') as f:
+        st.markdown(f'<style>{f.read()}</style',unsafe_allow_html = True)
 
 if 'number' not in st.session_state:
   st.session_state["number"] = 0
