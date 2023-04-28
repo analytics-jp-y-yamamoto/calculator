@@ -1,6 +1,6 @@
 # calculator
 
-https://analytics-jp-y-yamamoto-calculator-caliculater-6xo23r.streamlit.app/
+https://analytics-jp-y-yamamoto-calculator-calculator-p9hjq0.streamlit.app/
 
 ボタンの説明
 C：現在の入力を消去する
