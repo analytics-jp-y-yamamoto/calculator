@@ -40,7 +40,6 @@ if 'number' not in st.session_state:
   st.session_state["comma"] = 0
   st.session_state["deci_count"] = -1
   st.session_state["equal"] = 0
-  st.session_state["a"] = 0
   st.session_state["deci_total_count"] = 0
 
 if st.session_state["equal_count"] == 2:
@@ -64,7 +63,91 @@ def deci_cal(x):
         st.session_state["number"] += x
         st.session_state["formula"] += str(x)
 
+def on_ac_button():
+    st.session_state["comma_count"] = 0
+    st.session_state["answer"] = 0
+    st.session_state["cal_count"] = 0
+    st.session_state["number"] = 0
+    st.session_state["formula"] = "0"
+    st.session_state["deci"] = 0
+    st.session_state["deci_count"] = -1
+    st.session_state["equal_count"] = 1
+    st.session_state["comma"] = 0
+    st.session_state["deci_total_count"] = 0
+
+def on_equal_button():
+    if st.session_state["equal"] == 0:
+        st.session_state["answer"] += st.session_state["number"]
+        st.session_state["formula"] = st.session_state["answer"]
+
+    if st.session_state["equal"] == 1:
+        st.session_state["answer"] -= st.session_state["number"]
+        st.session_state["answer"] = round(st.session_state["answer"], (-1)*st.session_state["deci_count"])
+        st.session_state["formula"] = st.session_state["answer"]
+
+    if st.session_state["equal"] == 2:
+        st.session_state["deci_total_count"] *= (-1)*(st.session_state["deci_count"])
+        st.session_state["answer"] *= st.session_state["number"]
+        st.session_state["formula"] = round(st.session_state["answer"], (-1)*st.session_state["deci_total_count"])
+
+    if st.session_state["equal"] == 3:
+        st.session_state["answer"] /= st.session_state["number"]
+        st.session_state["formula"] = st.session_state["answer"]
+
+    st.session_state["comma_count"] = 0
+    st.session_state["cal_count"] = 0
+    st.session_state["number"] = 0
+    st.session_state["deci"] = 0
+    st.session_state["deci_count"] = -1
+    st.session_state["equal_count"] = 2
+    st.session_state["comma"] = 0
+    st.session_state["deci_total_count"] = 0
+
+def on_com_button():
+    st.session_state["deci"] = 1
+    if st.session_state["comma_count"]== 0:
+        st.session_state["formula"] += "0"
+    st.session_state["comma_count"] += 1
+    if st.session_state["comma"] == 0:
+        st.session_state["formula"] += "."
+        st.session_state["comma"] += 1
+
+def on_cle_button():
+    st.session_state["number"] = int(st.session_state["number"]/10)
+    st.session_state["formula"] = st.session_state["formula"][:-1]
+
 def cal(x, y):
+    if y == 0:
+        if st.session_state["cal_count"] == 0:
+            st.session_state["answer"] = st.session_state["number"]
+            st.session_state["cal_count"] += 1
+        else:
+            st.session_state["answer"] += st.session_state["number"]
+
+    if y == 1:
+        if st.session_state["cal_count"] == 0:
+            st.session_state["answer"] = st.session_state["number"]
+            st.session_state["cal_count"] += 1
+        else:
+            st.session_state["answer"] -= st.session_state["number"]
+            st.session_state["answer"] = round(st.session_state["answer"], (-1)*st.session_state["deci_count"])
+
+    if y == 2:
+        if st.session_state["cal_count"] == 0:
+            st.session_state["answer"] = st.session_state["number"]
+            st.session_state["cal_count"] += 1
+            st.session_state["deci_total_count"] += st.session_state["deci_count"]
+        else:
+            st.session_state["deci_total_count"] *= (-1)*(st.session_state["deci_count"])
+            st.session_state["answer"] *= st.session_state["number"]
+
+    if y == 3:
+        if st.session_state["cal_count"] == 0:
+            st.session_state["answer"] = st.session_state["number"]
+            st.session_state["cal_count"] += 1
+        else:
+            st.session_state["answer"] /= st.session_state["number"]
+
     st.session_state["formula"] += str(x)
     st.session_state["number"] = 0
     st.session_state["deci"] = 0
@@ -83,28 +166,12 @@ with st.container():
 
     with but_ac:
         if st.button('AC', use_container_width=360):
-            st.session_state["comma_count"] = 0
-            st.session_state["answer"] = 0
-            st.session_state["cal_count"] = 0
-            st.session_state["number"] = 0
-            st.session_state["formula"] = "0"
-            st.session_state["deci"] = 0
-            st.session_state["deci_count"] = -1
-            st.session_state["equal_count"] = 1
-            st.session_state["position"] = 1
-            st.session_state["comma"] = 0
-            st.session_state["deci_total_count"] = 0
+            on_ac_button()
     with but_cle:
         if st.button('C', use_container_width=164):
-                st.session_state["number"] = int(st.session_state["number"]/10)
-                st.session_state["formula"] = st.session_state["formula"][:-1]
+                on_cle_button()
     with but_div:
         if st.button('÷', use_container_width=164):
-            if st.session_state["cal_count"] == 0:
-                st.session_state["answer"] = st.session_state["number"]
-                st.session_state["cal_count"] += 1
-            else:
-                st.session_state["answer"] /= st.session_state["number"]
             cal("÷", 3)
 
     with but7:
@@ -118,13 +185,6 @@ with st.container():
             deci_cal(9)
     with but_mlp:
         if st.button('×', use_container_width=164):
-            if st.session_state["cal_count"] == 0:
-                st.session_state["answer"] = st.session_state["number"]
-                st.session_state["cal_count"] += 1
-                st.session_state["deci_total_count"] += st.session_state["deci_count"]
-            else:
-                st.session_state["deci_total_count"] *= (-1)*(st.session_state["deci_count"])
-                st.session_state["answer"] *= st.session_state["number"]
             cal("×", 2)
 
 
@@ -139,12 +199,6 @@ with st.container():
             deci_cal(6)
     with but_minus:
         if st.button('−', use_container_width=164):
-            if st.session_state["cal_count"] == 0:
-                st.session_state["answer"] = st.session_state["number"]
-                st.session_state["cal_count"] += 1
-            else:
-                st.session_state["answer"] -= st.session_state["number"]
-                st.session_state["answer"] = round(st.session_state["answer"], (-1)*st.session_state["deci_count"])
             cal("-", 1)
 
 
@@ -159,11 +213,6 @@ with st.container():
             deci_cal(3)
     with but_pls:
         if st.button('\+', use_container_width=164):
-            if st.session_state["cal_count"] == 0:
-                st.session_state["answer"] = st.session_state["number"]
-                st.session_state["cal_count"] += 1
-            else:
-                st.session_state["answer"] += st.session_state["number"]
             cal("+", 0)
 
     with but0:
@@ -172,42 +221,10 @@ with st.container():
 
     with but_com:
         if st.button('.', use_container_width=164):
-            st.session_state["deci"] = 1
-            if st.session_state["comma_count"]== 0:
-                st.session_state["formula"] += "0"
-            st.session_state["comma_count"] += 1
-            if st.session_state["comma"] == 0:
-                st.session_state["formula"] += "."
-                st.session_state["comma"] += 1
+            on_com_button()
     with but_eql:
         if st.button('=', use_container_width=164):
-            st.session_state["a"] = 1
-            if st.session_state["equal"] == 0:
-                st.session_state["answer"] += st.session_state["number"]
-                st.session_state["formula"] = st.session_state["answer"]
-
-            if st.session_state["equal"] == 1:
-                st.session_state["answer"] -= st.session_state["number"]
-                st.session_state["answer"] = round(st.session_state["answer"], (-1)*st.session_state["deci_count"])
-                st.session_state["formula"] = st.session_state["answer"]
-
-            if st.session_state["equal"] == 2:
-                st.session_state["deci_total_count"] *= (-1)*(st.session_state["deci_count"])
-                st.session_state["answer"] *= st.session_state["number"]
-                st.session_state["formula"] = round(st.session_state["answer"], (-1)*st.session_state["deci_total_count"])
-
-            if st.session_state["equal"] == 3:
-                st.session_state["answer"] /= st.session_state["number"]
-                st.session_state["formula"] = st.session_state["answer"]
-
-            st.session_state["comma_count"] = 0
-            st.session_state["cal_count"] = 0
-            st.session_state["number"] = 0
-            st.session_state["deci"] = 0
-            st.session_state["deci_count"] = -1
-            st.session_state["equal_count"] = 2
-            st.session_state["comma"] = 0
-            st.session_state["deci_total_count"] = 0
+            on_equal_button()
 
     with output:
         st.write('<span style="font-size:60px;background-color:#000000;color:#ffffff;text-align:right;">'+ str(st.session_state["formula"]) + '</span>',
