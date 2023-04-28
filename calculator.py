@@ -170,7 +170,6 @@ with st.container():
     but4, but5, but6, but_minus = st.columns([1,1,1,1])
     but3, but2, but1, but_pls = st.columns([1,1,1,1])
     but0, but_com, but_eql = st.columns([2.04,1,1])
-    st.write(st.session_state["cal_flag"])
 
     with but_ac:
         if st.button('AC', use_container_width=360):
