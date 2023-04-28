@@ -47,23 +47,23 @@ if st.session_state["equal_count"] == 2:
     st.session_state["formula"] = ""
     st.session_state["equal_count"] = 1
 
-def deci_cal(x): #押下された数字入力用 x:int型
+def deci_cal(number): #押下された数字入力用 x:int型
     st.session_state["cal_flag"] = 0
     if st.session_state["equal_count"] == 1:
         st.session_state["formula"] = ""
         st.session_state["equal_count"] = 0
 
     if st.session_state["deci"] == 1: #小数点が押されている場合は小数に変換し代入
-        st.session_state["formula"] += str(x)
-        st.session_state["number"] += x*10**(st.session_state["deci_count"])
+        st.session_state["formula"] += str(number)
+        st.session_state["number"] += number*10**(st.session_state["deci_count"])
         st.session_state["number"] = round(st.session_state["number"], (-1)*st.session_state["deci_count"])
         st.session_state["deci_count"] -= 1
 
     else: #小数点が押されていない場合は元の数字を10倍して足す
         st.session_state["comma_count"] += 1
         st.session_state["number"] *= 10
-        st.session_state["number"] += x
-        st.session_state["formula"] += str(x)
+        st.session_state["number"] += number
+        st.session_state["formula"] += str(number)
 
 def on_ac_button_clicked(): #ACボタンが押されたら変数リセット
     st.session_state["cal_flag"] = 0
@@ -79,21 +79,21 @@ def on_ac_button_clicked(): #ACボタンが押されたら変数リセット
     st.session_state["deci_total_count"] = 0
 
 def on_equal_button_clicked(): #=ボタンが押された場合の処理
-    if st.session_state["equal"] == 0:
+    if st.session_state["equal"] == "+":
         st.session_state["answer"] += st.session_state["number"]
         st.session_state["formula"] = st.session_state["answer"]
 
-    if st.session_state["equal"] == 1:
+    elif st.session_state["equal"] == "-":
         st.session_state["answer"] -= st.session_state["number"]
         st.session_state["answer"] = round(st.session_state["answer"], (-1)*st.session_state["deci_count"])
         st.session_state["formula"] = st.session_state["answer"]
 
-    if st.session_state["equal"] == 2:
+    elif st.session_state["equal"] == "×":
         st.session_state["deci_total_count"] *= (-1)*(st.session_state["deci_count"])
         st.session_state["answer"] *= st.session_state["number"]
         st.session_state["formula"] = round(st.session_state["answer"], (-1)*st.session_state["deci_total_count"])
 
-    if st.session_state["equal"] == 3:
+    elif st.session_state["equal"] == "÷":
         st.session_state["answer"] /= st.session_state["number"]
         st.session_state["formula"] = st.session_state["answer"]
 
@@ -120,17 +120,17 @@ def on_cle_button_clicked():
     st.session_state["number"] = int(st.session_state["number"]/10)
     st.session_state["formula"] = st.session_state["formula"][:-1]
 
-def cal(x, y): #演算処理&答え表示処理 x:str型(+,-,×,÷), y:int型 y=0:和,y=1:差,y=2:積,y=3:商の判定
+def cal(operator): #演算処理&答え表示処理 operator:str型(+,-,×,÷)
     st.session_state["cal_flag"] += 1
     if st.session_state["cal_flag"] == 1:
-        if y == 0:
+        if operator == "+":
             if st.session_state["cal_count"] == 0:
                 st.session_state["answer"] = st.session_state["number"]
                 st.session_state["cal_count"] += 1
             else:
                 st.session_state["answer"] += st.session_state["number"]
 
-        if y == 1:
+        elif operator == "-":
             if st.session_state["cal_count"] == 0:
                 st.session_state["answer"] = st.session_state["number"]
                 st.session_state["cal_count"] += 1
@@ -138,7 +138,7 @@ def cal(x, y): #演算処理&答え表示処理 x:str型(+,-,×,÷), y:int型 y=
                 st.session_state["answer"] -= st.session_state["number"]
                 st.session_state["answer"] = round(st.session_state["answer"], (-1)*st.session_state["deci_count"])
 
-        if y == 2:
+        elif operator == "×":
             if st.session_state["cal_count"] == 0:
                 st.session_state["answer"] = st.session_state["number"]
                 st.session_state["cal_count"] += 1
@@ -147,19 +147,19 @@ def cal(x, y): #演算処理&答え表示処理 x:str型(+,-,×,÷), y:int型 y=
                 st.session_state["deci_total_count"] *= (-1)*(st.session_state["deci_count"])
                 st.session_state["answer"] *= st.session_state["number"]
 
-        if y == 3:
+        elif operator == "÷":
             if st.session_state["cal_count"] == 0:
                 st.session_state["answer"] = st.session_state["number"]
                 st.session_state["cal_count"] += 1
             else:
                 st.session_state["answer"] /= st.session_state["number"]
 
-        st.session_state["formula"] += str(x)
+        st.session_state["formula"] += operator
         st.session_state["number"] = 0
         st.session_state["deci"] = 0
         st.session_state["deci_count"] = -1
         st.session_state["comma"] = 0
-        st.session_state["equal"] = y
+        st.session_state["equal"] = operator
 
 
 
@@ -179,7 +179,7 @@ with st.container():
             on_cle_button_clicked()
     with but_div:
         if st.button('÷', use_container_width=164):
-            cal("÷", 3)
+            cal("÷")
 
     with but7:
         if st.button('7', use_container_width=164):
@@ -192,7 +192,7 @@ with st.container():
             deci_cal(9)
     with but_mlp:
         if st.button('×', use_container_width=164):
-            cal("×", 2)
+            cal("×")
 
 
     with but4:
@@ -206,7 +206,7 @@ with st.container():
             deci_cal(6)
     with but_minus:
         if st.button('−', use_container_width=164):
-            cal("-", 1)
+            cal("-")
 
 
     with but3:
@@ -220,7 +220,7 @@ with st.container():
             deci_cal(3)
     with but_pls:
         if st.button('\+', use_container_width=164):
-            cal("+", 0)
+            cal("+")
 
     with but0:
         if st.button('0', use_container_width=360):
