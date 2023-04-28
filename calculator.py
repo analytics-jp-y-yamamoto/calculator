@@ -30,40 +30,40 @@ div.block-container{
 
 
 if 'number' not in st.session_state:
-  st.session_state["number"] = 0
-  st.session_state["comma_count"] = 0
-  st.session_state["cal_count"] = 0
-  st.session_state["equal_count"] = 1
-  st.session_state["answer"] = 0
-  st.session_state["formula"] = "0"
-  st.session_state["deci"] = 0
-  st.session_state["comma"] = 0
-  st.session_state["deci_count"] = -1
-  st.session_state["equal"] = 0
-  st.session_state["deci_total_count"] = 0
+  st.session_state["number"] = 0 #入力された数字保存用
+  st.session_state["comma_count"] = 0 #表示用の式の小数点の前に0を挿入する用
+  st.session_state["cal_count"] = 0 #演算回数カウント用
+  st.session_state["equal_count"] = 1 #=が押された後の表示判定用
+  st.session_state["answer"] = 0 #演算結果数字保存用
+  st.session_state["formula"] = "0" #表示される色保存用
+  st.session_state["deci"] = 0 #小数点ボタンの押下判定用
+  st.session_state["comma"] = 0 #式に小数点代入用
+  st.session_state["deci_count"] = -1 #小数点の桁数判定用
+  st.session_state["equal"] = 0 #=押下時の残りの演算判定用
+  st.session_state["deci_total_count"] = 0 #掛け算時の浮動小数点処理様
 
 if st.session_state["equal_count"] == 2:
     st.session_state["formula"] = ""
     st.session_state["equal_count"] = 1
 
-def deci_cal(x):
+def deci_cal(x): #押下された数字入力用 x:int型
     if st.session_state["equal_count"] == 1:
         st.session_state["formula"] = ""
         st.session_state["equal_count"] = 0
 
-    if st.session_state["deci"] == 1:
+    if st.session_state["deci"] == 1: #小数点が押されている場合は小数に変換し代入
         st.session_state["formula"] += str(x)
         st.session_state["number"] += x*10**(st.session_state["deci_count"])
         st.session_state["number"] = round(st.session_state["number"], (-1)*st.session_state["deci_count"])
         st.session_state["deci_count"] -= 1
 
-    else:
+    else: #小数点が押されていない場合は元の数字を10倍して足す
         st.session_state["comma_count"] += 1
         st.session_state["number"] *= 10
         st.session_state["number"] += x
         st.session_state["formula"] += str(x)
 
-def on_ac_button():
+def on_ac_button_clicked(): #ACボタンが押されたら変数リセット
     st.session_state["comma_count"] = 0
     st.session_state["answer"] = 0
     st.session_state["cal_count"] = 0
@@ -75,7 +75,7 @@ def on_ac_button():
     st.session_state["comma"] = 0
     st.session_state["deci_total_count"] = 0
 
-def on_equal_button():
+def on_equal_button_clicked(): #=ボタンが押された場合の処理
     if st.session_state["equal"] == 0:
         st.session_state["answer"] += st.session_state["number"]
         st.session_state["formula"] = st.session_state["answer"]
@@ -103,7 +103,7 @@ def on_equal_button():
     st.session_state["comma"] = 0
     st.session_state["deci_total_count"] = 0
 
-def on_com_button():
+def on_com_button_clicked():
     st.session_state["deci"] = 1
     if st.session_state["comma_count"]== 0:
         st.session_state["formula"] += "0"
@@ -112,11 +112,11 @@ def on_com_button():
         st.session_state["formula"] += "."
         st.session_state["comma"] += 1
 
-def on_cle_button():
+def on_cle_button_clicked():
     st.session_state["number"] = int(st.session_state["number"]/10)
     st.session_state["formula"] = st.session_state["formula"][:-1]
 
-def cal(x, y):
+def cal(x, y): #演算処理&答え表示処理 x:str型(+,-,×,÷), y:int型 y=0:和,y=1:差,y=2:積,y=3:商の判定
     if y == 0:
         if st.session_state["cal_count"] == 0:
             st.session_state["answer"] = st.session_state["number"]
@@ -166,10 +166,10 @@ with st.container():
 
     with but_ac:
         if st.button('AC', use_container_width=360):
-            on_ac_button()
+            on_ac_button_clicked()
     with but_cle:
         if st.button('C', use_container_width=164):
-                on_cle_button()
+            on_cle_button_clicked()
     with but_div:
         if st.button('÷', use_container_width=164):
             cal("÷", 3)
@@ -221,10 +221,10 @@ with st.container():
 
     with but_com:
         if st.button('.', use_container_width=164):
-            on_com_button()
+            on_com_button_clicked()
     with but_eql:
         if st.button('=', use_container_width=164):
-            on_equal_button()
+            on_equal_button_clicked()
 
     with output:
         st.write('<span style="font-size:60px;background-color:#000000;color:#ffffff;text-align:right;">'+ str(st.session_state["formula"]) + '</span>',
